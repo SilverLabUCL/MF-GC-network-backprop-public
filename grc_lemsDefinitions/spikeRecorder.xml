@@ -1,0 +1,21 @@
+<Lems>
+    <Include file="Synapses.xml"/>
+
+    <ComponentType name="spikeRecorder"
+                 extends="baseSynapse"
+                 description="Records the arrival times of incoming spikes, and keeps the count of the total. Very crude implementation, but gets the job done.">
+        <Dynamics>
+            <StateVariable name="i" exposure="i" dimension="current"/>
+            <StateVariable name="spikeCount" dimension="none"/>
+            <OnEvent port="in">
+                <StateAssignment variable="spikeCount" value="spikeCount + 1"/>
+            </OnEvent>
+            <OnStart>
+                <StateAssignment variable="i" value="0"/>
+                <StateAssignment variable="spikeCount" value="0"/>
+            </OnStart>
+        </Dynamics>
+    </ComponentType>
+
+
+</Lems>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 http://neuroml.svn.sourceforge.net/viewvc/neuroml/NeuroML2/Schemas/NeuroML2/NeuroML_v2beta.xsd"
+         id="IaF_GrC">
+
+  <notes>NeuroML 2 file containing an abstract cell definition.</notes>
+
+  <iafRefCell id="IaF_GrC" leakReversal="-79.6539mV" leakConductance="1.5309nS" thresh="-40mV" reset="-63mV" C="3.22pF" refract="2ms">
+    <notes>
+      Integrate and fire granule cell model with average parameters as
+      published in Schwartz 2012, with the value for the GABA reversal
+      potential updated from Seja 2012. Membrane leak incorporates the
+      actual leak conductance (g=1.06nS, erev=-79.9mV) as well as the
+      tonic GABA conductance (g=0.438nS, erev=-79.1mV).
+    </notes>
+  </iafRefCell>
+
+
+</neuroml>

@@ -1,0 +1,57 @@
+<Lems xmlns="http://www.neuroml.org/lems/0.7.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.neuroml.org/lems/0.7.2">
+
+    <Include file="NeuroMLCoreDimensions.xml"/>
+    <Include file="Synapses.xml"/>
+
+    <ComponentType name="spikeGeneratorRefPoisson"
+                 extends="spikeGeneratorPoisson"
+                 description="Generator of spikes whose ISI distribution is the maximum entropy distribution over [_minimumISI, +infinity) with mean 1/_averageRate">
+        <Parameter name="minimumISI" dimension="time"/>
+        <Dynamics>
+            <StateVariable name="tsince" dimension="time" exposure="tsince"/>
+            <StateVariable name="isi" dimension="time"/>
+            <TimeDerivative variable="tsince" value="1"/>
+
+            <OnStart>
+                <StateAssignment variable="tsince" value="0"/>
+                <StateAssignment variable="isi" value="minimumISI - (averageIsi-minimumISI) * log(1 - random(1))"/>
+            </OnStart>
+
+            <OnCondition test="tsince .gt. isi">
+                <StateAssignment variable="tsince" value="0"/>
+                <StateAssignment variable="isi" value="minimumISI - (averageIsi-minimumISI) * log(1 - random(1))"/>
+                <EventOut port="spike"/>
+            </OnCondition>
+        </Dynamics>
+    </ComponentType>
+
+    <ComponentType name="spikeGeneratorDelay"
+                   extends="spikeGenerator"
+                   description="Simple generator of spikes at a regular interval
+		     set by _period, emitting the first spike at time
+		     _delay + _period.">
+
+        <Parameter name="delay"
+                   dimension="time"
+                   description="Delay from the start of the simulation."/>
+        <Dynamics>
+            <StateVariable name="tsince" dimension="time" exposure="tsince"/>
+
+            <TimeDerivative variable="tsince" value="1"/>
+
+            <OnStart>
+                <StateAssignment variable="tsince" value="- delay"/>
+            </OnStart>
+
+            <OnCondition test="tsince .gt. period">
+                <StateAssignment variable="tsince" value="0"/>
+                <EventOut port="spike"/>
+            </OnCondition>
+
+        </Dynamics>
+
+    </ComponentType>
+
+</Lems>

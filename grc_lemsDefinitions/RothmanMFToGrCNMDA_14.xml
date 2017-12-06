@@ -1,0 +1,134 @@
+<Lems xmlns="http://www.neuroml.org/lems/0.7.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.neuroml.org/lems/0.7.2">
+
+    <Include file="NeuroMLCoreDimensions.xml"/>
+    <Include file="Synapses.xml"/>
+
+  <TriExpBlockStpSynapse id="RothmanMFToGrCNMDA"
+			 erev="0 mV"
+			 directAmp1="17.00 nS"
+			 directAmp2="2.645 nS"
+			 directTauRise="0.8647 ms"
+			 directTauDecay1="13.52 ms"
+			 directTauDecay2="121.9 ms"
+       scalefactor="0.28571">
+    <plasticityMechanism type="tsodyksMarkramDepFacMechanism"
+			 initReleaseProb="0.03220"
+			 tauFac="6.394 ms"
+			 tauRec="236.1 ms" />
+    <blockMechanism type="RothmanBlockMechanism"
+            id="block"
+		    species="mg"
+		    z="2"
+		    T="35 degC"
+		    blockConcentration="1 mM"
+		    deltaBind="0.35"
+		    deltaPerm="0.53"
+		    C1="2.07 mM"
+		    C2="0.015 mM"/>
+    <notes>
+      NMDAR-mediated synapse between mossy fibre and cerebellar
+      granule cell. Short term plasticity and waveform shapes (ie
+      relative amplitudes of exponential factors) are modeled on data
+      published in Rothman2009; absolute peak amplitude is taken from
+      Schwartz2012.
+    </notes>
+  </TriExpBlockStpSynapse>
+
+  <ComponentType name="TriExpBlockStpSynapse"
+                   extends="baseVoltageDepSynapse"
+                   description="Blocking synapse with short term plasticity and triexponential basic waveform (one rise time, two decay times).">
+        
+      <Property name="weight" dimension="none" defaultValue="1"/> 
+      
+      <Parameter name="erev" dimension="voltage" description="Reversal potential of the synapse"/>
+      
+      <Children name="plasticityMechanism" type="basePlasticityMechanism"/>
+      <Children name="blockMechanism" type="baseBlockMechanism"/>
+
+      <Parameter name="scalefactor" dimension="none" description="Scale factor to compare different synaptic connections"/>
+
+      <EventPort name="relay" direction="out" description="Used to relay incoming spikes to child plasticity mechanism"/>
+      
+      <Exposure name="g" dimension="conductance" description="Time varying conductance through the synapse"/>
+
+      <!-- DIRECT -->
+      <!-- waveform shape parameters -->
+      <Parameter name="directAmp1" dimension="conductance"/>
+      <Parameter name="directAmp2" dimension="conductance"/>
+      <Parameter name="directTauRise" dimension="time"/>
+      <Parameter name="directTauDecay1" dimension="time"/>
+      <Parameter name="directTauDecay2" dimension="time"/>
+
+      <Dynamics>
+          <DerivedVariable name="blockFactor" dimension="none" select="blockMechanism[*]/blockFactor" reduce="multiply"/>
+          <DerivedVariable name="g" dimension="conductance" exposure="g" value="scalefactor * blockFactor * (directAmp1 * (directB1 - directA1) + directAmp2 * (directB2 - directA2))" />
+          <DerivedVariable name="i" exposure="i" dimension="current" value="g * (erev - v)" />
+
+          <!-- DIRECT -->
+          <StateVariable name="directA1" dimension="none"/>
+          <StateVariable name="directA2" dimension="none"/>
+          <StateVariable name="directB1" dimension="none"/>
+          <StateVariable name="directB2" dimension="none"/>
+
+          <DerivedVariable name="directPeakTime1" dimension="time" value="(directTauRise * directTauDecay1)/(directTauDecay1 - directTauRise) * log(directTauDecay1 / directTauRise)" />
+          <DerivedVariable name="directPeakTime2" dimension="time" value="(directTauRise * directTauDecay2)/(directTauDecay2 - directTauRise) * log(directTauDecay2 / directTauRise)" />
+          <DerivedVariable name="directFactor1" dimension="none" value="1 / (-exp(-directPeakTime1 / directTauRise) + exp(-directPeakTime1 / directTauDecay1))" />
+          <DerivedVariable name="directFactor2" dimension="none" value="1 / (-exp(-directPeakTime2 / directTauRise) + exp(-directPeakTime2 / directTauDecay2))" />
+
+          <DerivedVariable name="directPlasticityFactor" dimension="none" select="plasticityMechanism[*]/plasticityFactor" reduce="multiply"/>
+
+          <TimeDerivative variable="directA1" value="-directA1 / directTauRise" />
+          <TimeDerivative variable="directA2" value="-directA2 / directTauRise" />
+          <TimeDerivative variable="directB1" value="-directB1 / directTauDecay1" />
+          <TimeDerivative variable="directB2" value="-directB2 / directTauDecay2" />
+
+          <OnStart>
+              <!-- DIRECT -->
+              <StateAssignment variable="directA1" value="0" />
+              <StateAssignment variable="directA2" value="0" />
+              <StateAssignment variable="directB1" value="0" />
+              <StateAssignment variable="directB2" value="0" />
+          </OnStart>
+
+          <OnEvent port="in">
+              <!-- DIRECT -->
+              <StateAssignment variable="directA1" value="directA1 + (weight * directPlasticityFactor * directFactor1)" />
+              <StateAssignment variable="directA2" value="directA2 + (weight * directPlasticityFactor * directFactor2)" />
+              <StateAssignment variable="directB1" value="directB1 + (weight * directPlasticityFactor * directFactor1)" />
+              <StateAssignment variable="directB2" value="directB2 + (weight * directPlasticityFactor * directFactor2)" />
+              <EventOut port="relay"/>
+          </OnEvent>
+
+      </Dynamics>
+  </ComponentType>
+
+  <ComponentType name="RothmanBlockMechanism"
+                 extends="baseBlockMechanism"
+                 description="Synaptic blockage model used for the NMDA-mediated synapse in Schwartz2012.">
+
+      <Parameter name="z" dimension="none"/>
+      <Parameter name="T" dimension="temperature"/>
+      <Parameter name="blockConcentration" dimension="concentration"/>
+      <Parameter name="deltaBind" dimension="none"/>
+      <Parameter name="deltaPerm" dimension="none"/>
+      <Parameter name="C1" dimension="concentration"/>
+      <Parameter name="C2" dimension="concentration"/>
+
+      <Constant name="faradayConstant" dimension="charge_per_mole"
+              value="96485.3365 C_per_mol"/>
+      <Constant name="idealGasConstant" dimension="idealGasConstantDims"
+              value="8.3144621 J_per_K_per_mol"/>
+
+      <Requirement name="v" dimension="voltage"/>
+
+      <Text name="species"/>
+
+      <Dynamics>
+          <DerivedVariable name="theta" dimension="per_voltage" value="(z * faradayConstant) / (idealGasConstant * T)"/>
+          <DerivedVariable name="blockFactor" dimension="none" exposure="blockFactor" value="(C1 * exp(deltaBind * theta * v) + C2 * exp(-deltaPerm * theta * v)) / (C1 * exp(deltaBind * theta * v) + C2 * exp(-deltaPerm * theta * v) + blockConcentration * exp(-deltaBind * theta * v))"/>
+      </Dynamics>
+  </ComponentType>
+
+</Lems>

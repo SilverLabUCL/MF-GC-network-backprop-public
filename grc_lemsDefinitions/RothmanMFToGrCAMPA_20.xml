@@ -1,0 +1,154 @@
+<Lems xmlns="http://www.neuroml.org/lems/0.7.2"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.neuroml.org/lems/0.7.2">
+
+    <Include file="NeuroMLCoreDimensions.xml"/>
+    <Include file="Synapses.xml"/>
+
+
+    <TriExpDirectTetraExpSpilloverStpSynapse id="RothmanMFToGrCAMPA"
+                                           erev="0 mV"
+                                           directAmp1="3.724 nS"
+                                           directAmp2="0.3033 nS"
+                                           directTauRise="0.3274 ms"
+                                           directTauDecay1="0.3351 ms"
+                                           directTauDecay2="1.651 ms"
+                                           spilloverAmp1="0.2487 nS"
+                                           spilloverAmp2="0.2799 nS"
+                                           spilloverAmp3="0.1268 nS"
+                                           spilloverTauRise="0.5548 ms"
+                                           spilloverTauDecay1="0.4 ms"
+                                           spilloverTauDecay2="4.899 ms"
+                                           spilloverTauDecay3="43.10 ms"
+                                           scalefactor="0.2">
+        <directPM type="tsodyksMarkramDepMechanism"
+                               initReleaseProb="0.1249"
+                               tauRec="131 ms" />
+        <spilloverPM type="tsodyksMarkramDepMechanism"
+                                  initReleaseProb="0.2792"
+                                  tauRec="14.85 ms" />
+        <notes>
+            AMPAR-mediated synapse between mossy fibre and cerebellar
+            granule cell. Similarly to Schwartz2012, short term plasticity
+            and waveform shapes (ie relative amplitudes of exponential
+            factors) are modeled on data published in Rothman2009; absolute
+            peak amplitude is taken from Sargent2005.
+        </notes>
+    </TriExpDirectTetraExpSpilloverStpSynapse>
+
+
+    <ComponentType name="TriExpDirectTetraExpSpilloverStpSynapse"
+                   extends="baseVoltageDepSynapse"
+                   description="Synapse with a direct (fast) and a spillover (slow) component, each with its separate short term plasticity model. Basic waveforms are triexponential (one rise time, two decay times) for direct, and tetraexponential (one rise time, three decay times) for spillover.">
+        <Constant name="tsinceRate" dimension="none" value="1"/>
+        <Parameter name="erev" dimension="voltage" description="Reversal potential of the synapse"/>
+        <Exposure name="g" dimension="conductance" description="Time varying conductance through the synapse"/>
+
+        <Parameter name="scalefactor" dimension="none"/>
+
+        <EventPort name="relay" direction="out" description="Used to relay incoming spikes to child plasticity mechanism"/>
+
+        <!-- DIRECT -->
+        <!-- waveform shape parameters -->
+        <Parameter name="directAmp1" dimension="conductance"/>
+        <Parameter name="directAmp2" dimension="conductance"/>
+        <Parameter name="directTauRise" dimension="time"/>
+        <Parameter name="directTauDecay1" dimension="time"/>
+        <Parameter name="directTauDecay2" dimension="time"/>
+        <!-- short term plasticity parameters -->
+        <Child name="directPM" type="basePlasticityMechanism"/>
+
+        <!-- SPILLOVER -->
+        <!-- waveform shape parameters -->
+        <Parameter name="spilloverAmp1" dimension="conductance"/>
+        <Parameter name="spilloverAmp2" dimension="conductance"/>
+        <Parameter name="spilloverAmp3" dimension="conductance"/>
+        <Parameter name="spilloverTauRise" dimension="time"/>
+        <Parameter name="spilloverTauDecay1" dimension="time"/>
+        <Parameter name="spilloverTauDecay2" dimension="time"/>
+        <Parameter name="spilloverTauDecay3" dimension="time"/>
+        <!-- short term plasticity parameters -->
+        <Child name="spilloverPM" type="basePlasticityMechanism"/>
+
+        <Dynamics>
+            <DerivedVariable name="g" dimension="conductance" exposure="g" value="scalefactor * (directAmp1 * (directB1 - directA1) + directAmp2 * (directB2 - directA2) + spilloverAmp1 * (spilloverB1 - spilloverA1) + spilloverAmp2 * (spilloverB2 - spilloverA2) + spilloverAmp3 * (spilloverB3 - spilloverA3))"/>
+            <DerivedVariable name="i" exposure="i" dimension="current" value="g * (erev - v)" />
+
+            <!-- DIRECT -->
+            <StateVariable name="directA1" dimension="none"/>
+            <StateVariable name="directA2" dimension="none"/>
+            <StateVariable name="directB1" dimension="none"/>
+            <StateVariable name="directB2" dimension="none"/>
+
+            <DerivedVariable name="directPeakTime1" dimension="time" value="(directTauRise * directTauDecay1)/(directTauDecay1 - directTauRise) * log(directTauDecay1 / directTauRise)" />
+            <DerivedVariable name="directPeakTime2" dimension="time" value="(directTauRise * directTauDecay2)/(directTauDecay2 - directTauRise) * log(directTauDecay2 / directTauRise)" />
+            <DerivedVariable name="directFactor1" dimension="none" value="1 / (-exp(-directPeakTime1 / directTauRise) + exp(-directPeakTime1 / directTauDecay1))" />
+            <DerivedVariable name="directFactor2" dimension="none" value="1 / (-exp(-directPeakTime2 / directTauRise) + exp(-directPeakTime2 / directTauDecay2))" />
+
+            <TimeDerivative variable="directA1" value="-directA1 / directTauRise" />
+            <TimeDerivative variable="directA2" value="-directA2 / directTauRise" />
+            <TimeDerivative variable="directB1" value="-directB1 / directTauDecay1" />
+            <TimeDerivative variable="directB2" value="-directB2 / directTauDecay2" />
+
+            <DerivedVariable name="directPlasticityFactor" dimension="none" select="directPM/plasticityFactor" />
+
+            <!-- SPILLOVER -->
+            <StateVariable name="spilloverA1" dimension="none"/>
+            <StateVariable name="spilloverA2" dimension="none"/>
+            <StateVariable name="spilloverA3" dimension="none"/>
+            <StateVariable name="spilloverB1" dimension="none"/>
+            <StateVariable name="spilloverB2" dimension="none"/>
+            <StateVariable name="spilloverB3" dimension="none"/>
+
+            <DerivedVariable name="spilloverPeakTime1" dimension="time" value="(spilloverTauRise * spilloverTauDecay1)/(spilloverTauDecay1 - spilloverTauRise) * log(spilloverTauDecay1 / spilloverTauRise)" />
+            <DerivedVariable name="spilloverPeakTime2" dimension="time" value="(spilloverTauRise * spilloverTauDecay2)/(spilloverTauDecay2 - spilloverTauRise) * log(spilloverTauDecay2 / spilloverTauRise)" />
+            <DerivedVariable name="spilloverPeakTime3" dimension="time" value="(spilloverTauRise * spilloverTauDecay3)/(spilloverTauDecay3 - spilloverTauRise) * log(spilloverTauDecay3 / spilloverTauRise)" />
+            <DerivedVariable name="spilloverFactor1" dimension="none" value="1 / (-exp(-spilloverPeakTime1 / spilloverTauRise) + exp(-spilloverPeakTime1 / spilloverTauDecay1))" />
+            <DerivedVariable name="spilloverFactor2" dimension="none" value="1 / (-exp(-spilloverPeakTime2 / spilloverTauRise) + exp(-spilloverPeakTime2 / spilloverTauDecay2))" />
+            <DerivedVariable name="spilloverFactor3" dimension="none" value="1 / (-exp(-spilloverPeakTime3 / spilloverTauRise) + exp(-spilloverPeakTime3 / spilloverTauDecay3))" />
+
+            <TimeDerivative variable="spilloverA1" value="-spilloverA1 / spilloverTauRise" />
+            <TimeDerivative variable="spilloverA2" value="-spilloverA2 / spilloverTauRise" />
+            <TimeDerivative variable="spilloverA3" value="-spilloverA3 / spilloverTauRise" />
+            <TimeDerivative variable="spilloverB1" value="-spilloverB1 / spilloverTauDecay1" />
+            <TimeDerivative variable="spilloverB2" value="-spilloverB2 / spilloverTauDecay2" />
+            <TimeDerivative variable="spilloverB3" value="-spilloverB3 / spilloverTauDecay3" />
+
+            <DerivedVariable name="spilloverPlasticityFactor" dimension="none" select="spilloverPM/plasticityFactor" />
+
+            <OnStart>
+                <!-- DIRECT -->
+                <StateAssignment variable="directA1" value="0" />
+                <StateAssignment variable="directA2" value="0" />
+                <StateAssignment variable="directB1" value="0" />
+                <StateAssignment variable="directB2" value="0" />
+                <!-- SPILLOVER -->
+                <StateAssignment variable="spilloverA1" value="0" />
+                <StateAssignment variable="spilloverA2" value="0" />
+                <StateAssignment variable="spilloverA3" value="0" />
+                <StateAssignment variable="spilloverB1" value="0" />
+                <StateAssignment variable="spilloverB2" value="0" />
+                <StateAssignment variable="spilloverB3" value="0" />
+            </OnStart>
+
+            <OnEvent port="in">
+                <!-- DIRECT -->
+                <StateAssignment variable="directA1" value="directA1 + directPlasticityFactor * directFactor1" />
+                <StateAssignment variable="directA2" value="directA2 + directPlasticityFactor * directFactor2" />
+                <StateAssignment variable="directB1" value="directB1 + directPlasticityFactor * directFactor1" />
+                <StateAssignment variable="directB2" value="directB2 + directPlasticityFactor * directFactor2" />
+                <!-- SPILLOVER -->
+                <StateAssignment variable="spilloverA1" value="spilloverA1 + spilloverPlasticityFactor * spilloverFactor1" />
+                <StateAssignment variable="spilloverA2" value="spilloverA2 + spilloverPlasticityFactor * spilloverFactor2" />
+                <StateAssignment variable="spilloverA3" value="spilloverA3 + spilloverPlasticityFactor * spilloverFactor3" />
+                <StateAssignment variable="spilloverB1" value="spilloverB1 + spilloverPlasticityFactor * spilloverFactor1" />
+                <StateAssignment variable="spilloverB2" value="spilloverB2 + spilloverPlasticityFactor * spilloverFactor2" />
+                <StateAssignment variable="spilloverB3" value="spilloverB3 + spilloverPlasticityFactor * spilloverFactor3" />
+                <!-- Plasticity -->
+                <EventOut port="relay"/>
+            </OnEvent>
+
+        </Dynamics>
+    </ComponentType>
+
+</Lems>
