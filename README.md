@@ -10,7 +10,7 @@ To generate new network connectivities, use:
 network_structures/GCL_make_connectivity.py
 ```
 
-To change input statistics, use 
+To change input statistics, use:
 ```
 input_statistics/generate_input_patterns.m
 ``` 
@@ -28,11 +28,11 @@ This creates the file params_file.pkl, which is used to run array jobs on an ext
 ```
 biophysical_model/run_mf_grc_network.py
 ```
-This saves the GC and MF spike times as .dat files for each simulation. To save memory and analyse further, after finishing the simulations run:
+This saves the GC and MF spike times as .dat files for each simulation. To save memory, after finishing the simulations run the following code and then remove the .dat files:
 ```
 biophysical_model/save_samples_as_txt.py
 ```
-to convert the spike times to spike count activity patterns, and remove the .dat files. 
+This converts the spike times to spike count activity patterns, which are used in all analyses.
 
 Note that simulating the biophysical model requires NeuroML2, jNeuroML, and pyNeuroML (https://github.com/NeuroML). The folder grc_lemsDefinitions includes NeuroML2 and XML files necessary to run the biophysical model. 
 
