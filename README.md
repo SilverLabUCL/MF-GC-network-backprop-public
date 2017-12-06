@@ -1,6 +1,6 @@
 # MF-GC-network-backprop-public
 
-This is the code necessary to reproduce all major figures for Cayco-Gajic, Clopath & Silver 2017, "Sparse synaptic connectivity is required for decorrelation and pattern separation in feedforward networks." A simplified version of the biophysical model is available in the standalone folder osb_model. See also: http://www.opensourcebrain.org/projects/grclayer-caycogajic2017
+This is the code necessary to reproduce all major figures for Cayco-Gajic, Clopath & Silver 2017, "Sparse synaptic connectivity is required for decorrelation and pattern separation in feedforward networks." A simplified version of the biophysical model is available in the standalone folder ``osb_model``. See also: http://www.opensourcebrain.org/projects/grclayer-caycogajic2017
 
 ### Getting started
 This repo contains both Matlab and Python code. In general, the Matlab scripts are designed to be run locally and Python scripts to be run on a cluster. All simulations require pre-generated network connectivities and input statistics, which are used by both the analytical and biophysical models. These can either be generated from scratch (see below) or example pre-generated models can be downloaded from a sister GitHub repo (see section 'Pre-simulated data').
@@ -14,7 +14,7 @@ To change input statistics, use:
 ```
 input_statistics/generate_input_patterns.m
 ``` 
-This requires the Dichotomized Gaussian tools from the Macke Lab in order to generate spike trains with arbitrary correlations. See: https://bitbucket.org/mackelab/pop_spike/src
+This requires the Dichotomized Gaussian tools from the Macke Lab in order to generate spike trains with arbitrary correlations. See: https://bitbucket.org/mackelab/pop_spike/src.
 
 ### Pre-simulated data
 To quickly generate figures from the paper, pre-generated files / pre-simulated data can be downloaded from: https://github.com/SilverLabUCL/MF-GC-network-backprop-data.
@@ -24,7 +24,7 @@ For the analytical model, simulations are done within the .m plotting files, or 
 ```
 biophysical_model/initialize_network_params.py
 ```
-This creates the file params_file.pkl, which is used to run array jobs on an external cluster (skip this step if using pre-simulated data). After initialisation, the following script simulates the model:
+This creates the file params_file.pkl, which is used to run array jobs on an external cluster (skip this step if using pre-simulated data). After initialization, the following script simulates the model:
 ```
 biophysical_model/run_mf_grc_network.py
 ```
