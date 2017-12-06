@@ -1,6 +1,6 @@
 # MF-GC-network-backprop-public
 
-This is the code necessary to reproduce all major figures for Cayco-Gajic, Clopath, and Silver 2017, "Sparse synaptic connectivity is required for decorrelation and pattern separation in feedforward networks." A simplified version of the biophysical model is available in the standalone folder osb_model. See also: http://www.opensourcebrain.org/projects/grclayer-caycogajic2017
+This is the code necessary to reproduce all major figures for Cayco-Gajic, Clopath & Silver 2017, "Sparse synaptic connectivity is required for decorrelation and pattern separation in feedforward networks." A simplified version of the biophysical model is available in the standalone folder osb_model. See also: http://www.opensourcebrain.org/projects/grclayer-caycogajic2017
 
 ### Getting started
 This repo contains both Matlab and Python code. In general, the Matlab scripts are designed to be run locally and Python scripts to be run on a cluster. All simulations require pre-generated network connectivities and input statistics, which are used by both the analytical and biophysical models. These can either be generated from scratch (see below) or example pre-generated models can be downloaded from a sister GitHub repo ('Pre-simulated data').
