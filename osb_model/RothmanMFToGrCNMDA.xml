@@ -1,9 +1,5 @@
-<Lems xmlns="http://www.neuroml.org/lems/0.7.2"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.neuroml.org/lems/0.7.2">
+<neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta5.xsd" id="network">
 
-    <Include file="NeuroMLCoreDimensions.xml"/>
-    <Include file="Synapses.xml"/>
 
   <TriExpBlockStpSynapse id="RothmanMFToGrCNMDA"
 			 erev="0 mV"
@@ -131,4 +127,5 @@
       </Dynamics>
   </ComponentType>
 
-</Lems>
+</neuroml>
+
