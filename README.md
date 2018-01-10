@@ -59,3 +59,5 @@ For the analytical model, the .m files above will automatically produce relevant
 ```
 biophysical_model/analyze_simulated_data.m
 ```
+
+[![Build Status](https://travis-ci.org/SilverLabUCL/MF-GC-network-backprop-public.svg?branch=master)](https://travis-ci.org/SilverLabUCL/MF-GC-network-backprop-public)
