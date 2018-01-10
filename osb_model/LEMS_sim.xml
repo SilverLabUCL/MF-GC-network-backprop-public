@@ -2,7 +2,7 @@
     
     <!-- 
 
-        This LEMS file has been automatically generated using PyNeuroML v0.3.5 (libNeuroML v0.2.34)
+        This LEMS file has been automatically generated using PyNeuroML v0.3.5 (libNeuroML v0.2.36)
 
      -->
     
@@ -14,6 +14,10 @@
     <Include file="Networks.xml"/>
     <Include file="Simulation.xml"/>
     
+    <Include file="spikeGenerators.xml"/>
+    <Include file="instances.xml"/>
+    <Include file="RothmanMFToGrCAMPA.xml"/>
+    <Include file="RothmanMFToGrCNMDA.xml"/>
     <Include file="OSBnet.nml"/>
    
     <Simulation id="sim" length="30ms" step="0.05ms" target="network" seed="123">  <!-- Note seed: ensures same random numbers used every run -->

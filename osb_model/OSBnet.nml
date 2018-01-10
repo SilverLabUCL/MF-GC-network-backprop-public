@@ -1,9 +1,5 @@
 <neuroml xmlns="http://www.neuroml.org/schema/neuroml2"  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.neuroml.org/schema/neuroml2 https://raw.github.com/NeuroML/NeuroML2/development/Schemas/NeuroML2/NeuroML_v2beta5.xsd" id="network">
-  <include href="RothmanMFToGrCAMPA.xml"/>  
-  <include href="RothmanMFToGrCNMDA.xml"/>
     <iafRefCell id="iaF_GrC" leakReversal="-79.67mV" thresh="-40mV" reset="-63mV" C="3.22pF" leakConductance="1.498nS" refract="2ms"/>
-    <spikeGeneratorRefPoisson averageRate="0 Hz" id="mossySpikerOFF" minimumISI="2 ms"/>
-  <spikeGeneratorRefPoisson averageRate="50 Hz" id="mossySpikerON" minimumISI="2 ms"/>
     <network id="network">
         <population id="iaF_GrCPop" component="iaF_GrC" size="487" type="populationList">
             <instance id="0">
