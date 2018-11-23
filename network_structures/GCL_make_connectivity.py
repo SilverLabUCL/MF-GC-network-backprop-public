@@ -24,16 +24,16 @@ def generate_glom_positions(p_num_glom,glom_density,dx,dy,dz,diam):
 	avg_mf_incube = int(avg_total_glom_incube/avg_glom_per_mf)
 	# Generate the number of glomeruli that each mossy fiber has:
 	num_glom = draw_from_p_num_glom(p_num_glom,avg_mf_incube)
-	glom_mf_id = np.zeros((num_glom.sum()),int) # vector that indexes which mossy fiber is associated with each glomeruli 
-	glom_pos = np.zeros((num_glom.sum(),3)); ix = 0 
+	glom_mf_id = np.zeros(int(num_glom.sum()),int) # vector that indexes which mossy fiber is associated with each glomeruli 
+	glom_pos = np.zeros((int(num_glom.sum()),3)); ix = 0 
 	for k in range(0,avg_mf_incube):
-		glom_mf_id[ix:ix+num_glom[k]] = k
+		glom_mf_id[ix:ix+int(num_glom[k])] = k
 		# For each mossy fiber, the first glomerulus is randomly (uniformly) positioned
 		glom_pos[ix,:] = np.random.uniform(low=-big_diam/2,high=big_diam/2,size=(3))
 		for j in range(1,int(num_glom[k])):
 			# Distance of each glomerulus belonging to mossy fiber k is exponentially distributed away from the previous glomerulus
 			glom_pos[ix+j] = glom_pos[ix+j-1,:] + [(-1)**np.round(np.random.uniform())*np.random.exponential(scale=dx),(-1)**np.round(np.random.uniform())*np.random.exponential(scale=dy),(-1)**np.round(np.random.uniform())*np.random.exponential(scale=dz)]
-		ix = ix + num_glom[k]
+		ix = ix + int(num_glom[k])
 	# Delete all glomeruli that do not lie within ball of diameter diam:
 	which_glom_in_ball = np.where(np.sqrt(glom_pos[:,0]**2+glom_pos[:,1]**2+glom_pos[:,2]**2)<=(diam)/2)[0]
 	glom_pos = glom_pos[which_glom_in_ball,:]; glom_mf_id = glom_mf_id[which_glom_in_ball]; glom_mf_id = renumber(glom_mf_id)
