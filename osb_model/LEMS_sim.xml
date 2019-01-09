@@ -2,7 +2,7 @@
     
     <!-- 
 
-        This LEMS file has been automatically generated using PyNeuroML v0.3.5 (libNeuroML v0.2.36)
+        This LEMS file has been automatically generated using PyNeuroML v0.3.14 (libNeuroML v0.2.45)
 
      -->
     
@@ -14,7 +14,6 @@
     <Include file="Networks.xml"/>
     <Include file="Simulation.xml"/>
     
-    <Include file="spikeGenerators.xml"/>
     <Include file="instances.xml"/>
     <Include file="RothmanMFToGrCAMPA.xml"/>
     <Include file="RothmanMFToGrCNMDA.xml"/>
