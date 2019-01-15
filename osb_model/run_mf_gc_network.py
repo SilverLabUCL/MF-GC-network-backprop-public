@@ -47,8 +47,9 @@ def generate_grc_layer_network(p_mf_ON,
     
     # load NeuroML components, LEMS components and LEMS componentTypes from external files
     
-    spike_generator_doc = pynml.read_lems_file(spike_generator_file_name)
-
+    ##spikeGeneratorRefPoisson is now a standard nml type...
+    ##spike_generator_doc = pynml.read_lems_file(spike_generator_file_name)
+    
     iaF_GrC = nml.IafRefCell(id="iaF_GrC",
                    refract="2ms",
                    C="3.22pF",
@@ -64,15 +65,17 @@ def generate_grc_layer_network(p_mf_ON,
     rothmanMFToGrCNMDA_doc = pynml.read_lems_file(nmda_syn_filename)
 
     # define some components from the componentTypes we just loaded
-    spike_generator_ref_poisson_type = spike_generator_doc.component_types['spikeGeneratorRefPoisson']
+    ##spike_generator_ref_poisson_type = spike_generator_doc.component_types['spikeGeneratorRefPoisson']
+    
     lems_instances_doc = lems.Model()
+    spike_generator_ref_poisson_type_name = 'spikeGeneratorRefPoisson'
 
-    spike_generator_on = lems.Component("mossySpikerON", spike_generator_ref_poisson_type.name)
+    spike_generator_on = lems.Component("mossySpikerON", spike_generator_ref_poisson_type_name)
     spike_generator_on.set_parameter("minimumISI", "%s ms"%minimumISI)
     spike_generator_on.set_parameter("averageRate", "%s Hz"%ONRate)
     lems_instances_doc.add(spike_generator_on)
 
-    spike_generator_off = lems.Component("mossySpikerOFF", spike_generator_ref_poisson_type.name)
+    spike_generator_off = lems.Component("mossySpikerOFF", spike_generator_ref_poisson_type_name)
     spike_generator_off.set_parameter("minimumISI", "%s ms"%minimumISI)
     spike_generator_off.set_parameter("averageRate", "%s Hz"%OFFRate)
     lems_instances_doc.add(spike_generator_off)
@@ -82,8 +85,14 @@ def generate_grc_layer_network(p_mf_ON,
 
     # create populations
     GrCPop = nml.Population(id=iaF_GrC.id+"Pop",component=iaF_GrC.id,type="populationList",size=N_grc)
+    GrCPop.properties.append(nml.Property(tag='color', value='0 0 0.8'))
+    GrCPop.properties.append(nml.Property(tag='radius', value=2))
     mossySpikersPopON = nml.Population(id=spike_generator_on.id+"Pop",component=spike_generator_on.id,type="populationList",size=N_mf_ON)
+    mossySpikersPopON.properties.append(nml.Property(tag='color', value='0.8 0 0'))
+    mossySpikersPopON.properties.append(nml.Property(tag='radius', value=2))
     mossySpikersPopOFF = nml.Population(id=spike_generator_off.id+"Pop",component=spike_generator_off.id,size=N_mf_OFF)
+    mossySpikersPopOFF.properties.append(nml.Property(tag='color', value='0 0.8 0'))
+    mossySpikersPopOFF.properties.append(nml.Property(tag='radius', value=2))
 
     # create network and add populations
     net = nml.Network(id="network")
@@ -161,13 +170,13 @@ def generate_grc_layer_network(p_mf_ON,
     pynml.write_lems_file(lems_instances_doc, lems_instances_file_name,validate=False)
     
     # Create a LEMSSimulation to manage creation of LEMS file
-    ls = LEMSSimulation('sim', duration, dt, lems_seed = 123)# int(np.round(1000*random.random())))
+    ls = LEMSSimulation('sim', duration, dt, simulation_seed = 123)# int(np.round(1000*random.random())))
     
     # Point to network as target of simulation
     ls.assign_simulation_target(net.id)
     
     # Include generated/existing NeuroML2 files
-    ls.include_lems_file(spike_generator_file_name, include_included=False)
+    ###ls.include_lems_file(spike_generator_file_name, include_included=False)
     ls.include_lems_file(lems_instances_file_name)
     ls.include_lems_file(ampa_syn_filename, include_included=False)
     ls.include_lems_file(nmda_syn_filename, include_included=False)
@@ -195,6 +204,7 @@ def generate_grc_layer_network(p_mf_ON,
     lems_file_name = ls.save_to_file()
 
     if run:
+        print('Running the generated LEMS file: %s for simulation of %sms'%(lems_file_name, duration))
         results = pynml.run_lems_with_jneuroml(lems_file_name,max_memory="8G", nogui=True, load_saved_data=False, plot=False)
         
         return results

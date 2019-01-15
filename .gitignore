@@ -1,0 +1,6 @@
+/network_structures/GCLconnectivity*.pkl
+/osb_model/OSBnet.nml.png
+/osb_model/OSBnet.nml.pov
+/osb_model/OSBnet.png
+/osb_model/OSBnet.svg
+/osb_model/*.gv*
